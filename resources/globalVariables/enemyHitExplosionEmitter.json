@@ -1,0 +1,84 @@
+{
+    "enemyHitExplosionEmitter": [
+        {
+            "blendMode": 3
+        },
+        {
+            "move": true
+        },
+        {
+            "field": true
+        },
+        {
+            "reflect": false
+        },
+        {
+            "changeScale": true
+        },
+        {
+            "1.structEmitter": {
+                "isLock": true,
+                "position": [
+                    0.0,
+                    0.20000000298023224,
+                    -0.5
+                ],
+                "emitterSizeMin": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "emitterSizeMax": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "lifeTime": 0.30000001192092896,
+                "frequency": 0.5,
+                "count": 10
+            }
+        },
+        {
+            "2.defParticle": {
+                "acceleration": [
+                    0.0,
+                    0.0,
+                    10.0
+                ],
+                "minScale": [
+                    0.10000000149011612,
+                    1.2000000476837158,
+                    1.0
+                ],
+                "maxScale": [
+                    0.30000001192092896,
+                    1.5,
+                    1.0
+                ],
+                "endScale": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "minVelocity": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "maxVelocity": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "minRotateZ": 0.0,
+                "maxRotateZ": 3.140000104904175,
+                "reflectY": 0.0,
+                "color": [
+                    0.0,
+                    0.8823530673980713,
+                    1.0
+                ]
+            }
+        }
+    ]
+}
