@@ -21,21 +21,12 @@ void GameCamera::Init()
 	CameraManager::GetInstance()->SetCamera(mainCamera_.get());
 	CameraManager::GetInstance()->SetActiveCamera(1);
 	mainCamera_->Update();
-
-	sabCamera_ = std::make_unique<Camera>();
-	sabCamera_->Initialize();
-	translation = global_->GetValue<Vector3>("CameraOffset", "sab_translation");
-	sabCamera_->SetTranslation(translation + player_->GetTransform().translation_);
-	CameraManager::GetInstance()->SetCamera(sabCamera_.get());
-	sabCamera_->Update();
 }
 
 void GameCamera::GlobalInit()
 {
 	global_->AddValue<Vector3>("CameraOffset", "rotation", Vector3{});
 	global_->AddValue<Vector3>("CameraOffset", "translation", Vector3{});
-
-	global_->AddValue<Vector3>("CameraOffset", "sab_translation", Vector3{});
 }
 
 void GameCamera::Update()
@@ -78,23 +69,23 @@ void GameCamera::Update()
 
 void GameCamera::SabUpdate()
 {
-	// プレイヤーの位置と回転
-	Vector3 playerPos = player_->GetTransform().translation_;
-	Quaternion playerRot = player_->GetTransform().rotation_;
+	//// プレイヤーの位置と回転
+	//Vector3 playerPos = player_->GetTransform().translation_;
+	//Quaternion playerRot = player_->GetTransform().rotation_;
 
-	// オフセット（プレイヤーの後方、例：Z方向-10など）
-	Vector3 offset = global_->GetValue<Vector3>("CameraOffset", "sab_translation");
+	//// オフセット（プレイヤーの後方、例：Z方向-10など）
+	//Vector3 offset = global_->GetValue<Vector3>("CameraOffset", "sab_translation");
 
-	// プレイヤーの回転を適用したオフセット
-	Matrix4x4 rotMat = Quaternion::MakeRotateMatrix(playerRot);
-	Vector3 rotatedOffset = Vector3::TransformNormal(offset, rotMat);
+	//// プレイヤーの回転を適用したオフセット
+	//Matrix4x4 rotMat = Quaternion::MakeRotateMatrix(playerRot);
+	//Vector3 rotatedOffset = Vector3::TransformNormal(offset, rotMat);
 
-	// カメラの位置は、プレイヤー位置 + 回転されたオフセット
-	Vector3 cameraPos = playerPos + rotatedOffset;
-	sabCamera_->SetTranslation(cameraPos);
+	//// カメラの位置は、プレイヤー位置 + 回転されたオフセット
+	//Vector3 cameraPos = playerPos + rotatedOffset;
+	//sabCamera_->SetTranslation(cameraPos);
 
-	// プレイヤーを見つめる
-	sabCamera_->SetLookAt(cameraPos, playerPos);
+	//// プレイヤーを見つめる
+	//sabCamera_->SetLookAt(cameraPos, playerPos);
 
 }
 

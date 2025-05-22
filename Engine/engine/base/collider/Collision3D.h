@@ -13,6 +13,11 @@ struct Segment {
 	Vector3 origin;
 	Vector3 diff;
 };
+struct RaycastHit {
+	Vector3 point; 
+	Vector3 normal;
+	float   t;     
+};
 // 回転無しボックス
 struct AABB {
 	Vector3 min;
@@ -45,6 +50,7 @@ public:
 
 	// OBBとSegmentの衝突判定
 	static bool OBBSegment(const Collider* a, const Collider* b);
+	static bool OBBSegment(const Collider* obbCol, const Collider* segCol, RaycastHit* hit);
 
 	// OBBとOBBの衝突判定
 	static bool OBBOBB(const Collider* a, const Collider* b);

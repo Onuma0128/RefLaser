@@ -21,20 +21,19 @@ public:
 
 private:
 
-	void ReloadBullet();
+	void PlayerMove();
+	void LaserMove();
+	void LaserAttack();
 
 	Quaternion VelocityToQuaternion(const Vector3& velocity, const float lerp);
 
 private:
 
-	// 今弾をリロードしているか
-	bool isReloadBullet_ = false;
-	// 一つの弾をリロードする時間
-	float reloadBulletTime_;
-
 	// 最後に向けたRightStickを保存する
 	Vector3 rightStickVelocity_{};
 	Quaternion rightStickQuaternion_{};
+	// レーザーが何反射しているか
+	uint32_t laserReflectCount_ = 0;
 
 };
 

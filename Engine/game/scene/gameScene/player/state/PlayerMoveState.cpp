@@ -21,6 +21,22 @@ void PlayerMoveState::Finalize()
 
 void PlayerMoveState::Update()
 {
+	// 移動処理
+	PlayerMove();
+
+	// レーザーの方向移動処理
+	LaserMove();
+
+	// レーザー発射する処理
+	LaserAttack();
+}
+
+void PlayerMoveState::Draw()
+{
+}
+
+void PlayerMoveState::PlayerMove()
+{
 	// Inputを取得
 	Input* input = Input::GetInstance();
 
@@ -36,69 +52,71 @@ void PlayerMoveState::Update()
 	if (velocity.Length() != 0.0f) {
 		// 回転を適応
 		player_->GetTransform().rotation_ = VelocityToQuaternion(velocity, 0.1f);
-		// 移動時のエフェクト
-		player_->GetEffect()->OnceMoveEffect();
 	}
+}
 
+void PlayerMoveState::LaserMove()
+{
 	// 右のスティックのvelocityを取得
+	Input* input = Input::GetInstance();
+	Vector3 velocity{};
 	velocity.x = input->GetGamepadRightStickX();
 	velocity.z = input->GetGamepadRightStickY();
+	// 押されているならvelocityを更新
 	if (velocity.Length() != 0.0f) {
-		rightStickVelocity_ = velocity;
-		// StickのVelocityから回転を計算
-		rightStickQuaternion_ = VelocityToQuaternion(rightStickVelocity_, 1.0f);
-		Quaternion target = Quaternion::Slerp(player_->GetRightStickQua(), rightStickQuaternion_, 0.3f);
-		player_->SetRightStickQua(target);
-	}
-	// 弾を発射する(弾を発射するとリロードが止まる)
-	if (input->TriggerGamepadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
-		isReloadBullet_ = false;
-		reloadBulletTime_ = 0.0f;
-		player_->AttackBullet();
-	}
-	// 弾のリロードを開始する
-	if (input->TriggerGamepadButton(XINPUT_GAMEPAD_LEFT_SHOULDER)) {
-		isReloadBullet_ = true;
-	}
-	// リロードをする関数
-	ReloadBullet();
-
-	// 避けの状態に遷移
-	if (input->TriggerGamepadButton(XINPUT_GAMEPAD_B)) {
-		player_->GetEffect()->OnceAvoidEffect();
-		player_->ChengeState(std::make_unique<PlayerAvoidState>(player_));
-		return;
+		velocity = velocity.Normalize();
+		rightStickVelocity_ = Vector3::Lerp(rightStickVelocity_, velocity, 0.5f);
 	}
 
-	// 必殺技の状態に遷移
-	if (input->GetGamepadLeftTrigger() != 0.0f && !player_->GetEffect()->GetIsSpecialMove()) {
-		player_->GetEffect()->SetIsSpecialMove(true);
-		player_->ChengeState(std::make_unique<PlayerSpecialMoveState>(player_));
-		return;
-	}
-}
+	Vector3 hitPos{};
+	Vector3 hitDir{};
+	bool isHit = false;
+	bool start = false;
+	laserReflectCount_ = 1;
 
-void PlayerMoveState::Draw()
-{
-}
-
-void PlayerMoveState::ReloadBullet()
-{
-	if (isReloadBullet_) {
-		// 前の時間を取得
-		int32_t previousTime = static_cast<int32_t>(reloadBulletTime_);
-		// リロードした瞬間一発リロードする
-		if (reloadBulletTime_ == 0.0f) {
-			player_->ReloadBullet();
+	for (auto& laser : player_->GetLasers()) {
+		if (!start) {
+			laser->Update(player_->GetTransform().translation_, rightStickVelocity_);
+			isHit = laser->GetIsHit();
+			laser->SetIsHit();
+			if (isHit) {
+				hitPos = laser->GetHitPosition();
+				hitDir = laser->GetHitDirection();
+			} else {
+				hitPos = player_->GetTransform().translation_;
+				hitDir = rightStickVelocity_;
+			}
+			start = true;
+		} else {
+			if (isHit) {
+				laser->Update(hitPos, hitDir);
+				hitPos = laser->GetHitPosition();
+				hitDir = laser->GetHitDirection();
+				++laserReflectCount_;
+			} else {
+				hitPos = player_->GetTransform().translation_;
+				hitDir = rightStickVelocity_;
+				laser->Update(hitPos, hitDir);
+			}
+			isHit = laser->GetIsHit();
+			laser->SetIsHit();
 		}
+	}
+}
 
-		// 今の時間を更新
-		reloadBulletTime_ += DeltaTimer::GetDeltaTime() * 10.0f;
-		int32_t currentTime = static_cast<int32_t>(reloadBulletTime_);
+void PlayerMoveState::LaserAttack()
+{
+	// Inputを取得
+	Input* input = Input::GetInstance();
 
-		// 1秒立ったらリロードをする
-		if (previousTime != currentTime) {
-			player_->ReloadBullet();
+	// ボタンが押されたら
+	if (input->TriggerGamepadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
+		// レーザーの反射している分だけコライダーをアクティブにする
+		uint32_t count = 0;
+		for (auto& laser : player_->GetLasers()) {
+			if (laserReflectCount_ == count) { break; }
+			laser->SetIsAttack(true);
+			++count;
 		}
 	}
 }

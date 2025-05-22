@@ -32,11 +32,6 @@ void Enemy::Update()
 	state_->Update();
 
 	effect_->Update();
-	if (player_->GetEffect()->GetSpecialState() == SpecialMoveState::Shrinking) {
-		Object3d::GetRenderOptions().offscreen = true;
-		Collider::isActive_ = true;
-		hitReticle_ = false;
-	}
 
 	Collider::centerPosition_ = transform_.translation_;
 	Collider::rotate_ = transform_.rotation_;
@@ -94,7 +89,6 @@ void Enemy::OnCollisionStay(Collider* other)
 
 	// プレイヤーのレティクルと当たっているなら
 	if (other->GetColliderName() == "PlayerReticle") {
-		hitReticle_ = true;
 		Object3d::GetRenderOptions().offscreen = false;
 		Collider::isActive_ = false;
 	}

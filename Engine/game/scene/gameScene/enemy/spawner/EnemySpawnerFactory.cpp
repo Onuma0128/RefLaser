@@ -6,8 +6,12 @@
 void EnemySpawnerFactory::Init()
 {
 	CreateSpawner(Vector3{ -10.0f,0.5f,0.0f });
-	//CreateSpawner(Vector3{ 0.0f,0.5f,0.0f });
+	CreateSpawner(Vector3{ 0.0f,0.5f,5.0f });
 	CreateSpawner(Vector3{ 10.0f,0.5f,0.0f });
+
+	CreateSpawner(Vector3{ -5.0f,0.5f,-5.0f });
+	CreateSpawner(Vector3{ 5.0f,0.5f,5.0f });
+	CreateSpawner(Vector3{ 15.0f,0.5f,-5.0f });
 }
 
 void EnemySpawnerFactory::Update()
@@ -31,6 +35,6 @@ void EnemySpawnerFactory::CreateSpawner(const Vector3& position)
 	spawner->SetGameCamera(gameCamera_);
 	spawner->Init();
 	spawner->GetTransform().translation_ = position;
-	spawner->EnemySpawn();
+	//spawner->EnemySpawn();
 	enemySpawners_.push_back(std::move(spawner));
 }

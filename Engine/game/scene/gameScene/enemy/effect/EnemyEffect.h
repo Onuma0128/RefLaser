@@ -32,13 +32,5 @@ private:
 	// パーティクルを管理する
 	ParticleManager* particleManager_ = ParticleManager::GetInstance();
 
-	// レティクルがヒットした時のエフェクト
-	struct HitReticleEffect {
-		std::unique_ptr<PrimitiveDrawr> cylinder_;
-		float frame_;
-		float axis_;
-	};
-	HitReticleEffect hitReticleEffect_;
-
 
 };

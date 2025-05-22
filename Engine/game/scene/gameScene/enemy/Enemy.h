@@ -36,8 +36,6 @@ public:
 
 	void SetVelocity(const Vector3& velocity) { velocity_ = velocity; }
 
-	bool GetHitReticle()const { return hitReticle_; }
-
 private:
 
 	// ゲッターで貰ったポインタ
@@ -52,9 +50,6 @@ private:
 
 	// 速度
 	Vector3 velocity_{};
-
-	// プレイヤーのReticleに当たっているか
-	bool hitReticle_ = false;
 
 };
 

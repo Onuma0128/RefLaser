@@ -38,6 +38,9 @@ public:
 
     static Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 
+    // 反射
+    static Vector3 Reflect(const Vector3 & v, const Vector3 & n);
+
     // 正規化
     Vector3 Normalize() const;
 
@@ -66,4 +69,7 @@ public:
 
     // フレンド関数：スカラー倍の演算子オーバーロード
     friend Vector3 operator*(float scalar, const Vector3& v);
+
+    float& operator[](int i);             // 書き込み用
+    const float& operator[](int i) const; // 読み取り用
 };

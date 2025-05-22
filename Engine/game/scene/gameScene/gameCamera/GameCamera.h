@@ -33,7 +33,6 @@ private:
 	Player* player_ = nullptr;
 
 	std::unique_ptr<Camera> mainCamera_ = nullptr;
-	std::unique_ptr<Camera> sabCamera_ = nullptr;
 
 	float shakeStrength_ = 0.0f;
 	float shakeDecay_ = 0.9f;   

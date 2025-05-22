@@ -32,6 +32,6 @@ void DirectionalLight::MakeLightData()
 	resource_->Map(0, nullptr, reinterpret_cast<void**>(&lightData_));
 	// デフォルト値
 	lightData_->color = { 1.0f,1.0f,1.0f,1.0f };
-	lightData_->direction = { 0.0f,1.0f,0.0f };
+	lightData_->direction = { 0.0f,1.0f,-0.5f };
 	lightData_->intensity = 1.0f;
 }

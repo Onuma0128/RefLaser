@@ -7,6 +7,7 @@ void EnemySpawner::Init()
 {
 	Object3d::Initialize("Box.obj");
 	Object3d::SetSceneRenderer();
+	//Object3d::GetRenderOptions().enabled = false;
 
 	Collider::AddCollider();
 	Collider::myType_ = ColliderType::OBB;
@@ -32,6 +33,24 @@ void EnemySpawner::Draw()
 {
 	for (auto& enemy : enemys_) {
 		enemy->Draw();
+	}
+}
+
+void EnemySpawner::OnCollisionEnter(Collider* other)
+{
+}
+
+void EnemySpawner::OnCollisionStay(Collider* other)
+{
+	if (other->GetColliderName() == "LaserLine") {
+		Object3d::SetColor(Vector4{ 1.0f,0.0f,0.0f,1.0f });
+	}
+}
+
+void EnemySpawner::OnCollisionExit(Collider* other)
+{
+	if (other->GetColliderName() == "LaserLine") {
+		Object3d::SetColor(Vector4{ 1.0f,1.0f,1.0f,1.0f });
 	}
 }
 

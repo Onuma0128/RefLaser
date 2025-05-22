@@ -208,6 +208,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\game\scene\gameScene\player\reticle\PlayerReticle.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\player\effect\PlayerBulletEffect.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\player\bullet\PredictionObject.cpp" />
+    <ClCompile Include="Engine\game\scene\gameScene\wall\Wall.cpp" />
+    <ClCompile Include="Engine\game\scene\gameScene\player\laser\PlayerLaser.cpp" />
+    <ClCompile Include="Engine\game\scene\gameScene\player\laser\LaserCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\game\scene\gameScene\enemy\spawner\EnemySpawnerFactory.h" />
@@ -319,6 +322,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\game\scene\gameScene\player\reticle\PlayerReticle.h" />
     <ClInclude Include="Engine\game\scene\gameScene\player\effect\PlayerBulletEffect.h" />
     <ClInclude Include="Engine\game\scene\gameScene\player\bullet\PredictionObject.h" />
+    <ClInclude Include="Engine\game\scene\gameScene\wall\Wall.h" />
+    <ClInclude Include="Engine\game\scene\gameScene\player\laser\PlayerLaser.h" />
+    <ClInclude Include="Engine\game\scene\gameScene\player\laser\LaserCollider.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">

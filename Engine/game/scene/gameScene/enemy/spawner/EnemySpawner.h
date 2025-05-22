@@ -16,6 +16,10 @@ public:
 
 	void Draw();
 
+	void OnCollisionEnter(Collider* other) override;
+	void OnCollisionStay(Collider* other) override;
+	void OnCollisionExit(Collider* other) override;
+
 	std::list<std::unique_ptr<Enemy>>& GetEnemyList() { return enemys_; }
 	
 	Player* GetPlayer() { return player_; }

@@ -2,8 +2,6 @@
 
 #include "PlayerBaseState.h"
 
-#include "Quaternion.h"
-
 class PlayerAvoidState :public PlayerBaseState
 {
 public:
@@ -19,12 +17,6 @@ public:
 	void Draw()override;
 
 private:
-
-	float avoidTime_ = 0.0f;
-
-	float velocityY_ = 0.0f;
-	float acceleration_ = 0.0f;
-	Quaternion rotateY_ = Quaternion::IdentityQuaternion();
 
 };
 

@@ -101,7 +101,7 @@ bool Collision3D::OBBSphere(const Collider* a, const Collider* b)
 	}
 }
 
-bool Collision3D::OBBSegment(const Collider* a, const Collider* b)
+bool Collision3D::OBBSegment(const Collider* a, const Collider* b) 
 {
 	OBB obb = ChangeOBB(a);
 	Segment segment = ChangeSegment(b);
@@ -138,6 +138,69 @@ bool Collision3D::OBBSegment(const Collider* a, const Collider* b)
 
 	// AABBとSegmentで判定を取る
 	return AABBSegment(aabb_OBBLocal, segment_OBBLocal);
+}
+
+bool Collision3D::OBBSegment(const Collider* obbCol, const Collider* segCol, RaycastHit* hit)
+{
+	// ① 既存関数と同じ前処理
+	OBB      obb = ChangeOBB(obbCol);
+	Segment  segW = ChangeSegment(segCol);
+
+	// OBB ローカル空間へ変換（既存処理をそのまま使用）
+	Matrix4x4 invM = Matrix4x4::Inverse(
+		Matrix4x4::Translate(obb.center) * obb.rotateMatrix);
+
+	Segment segL = {
+		.origin = Vector3::Transform(segW.origin,invM),
+		.diff = Vector3::TransformNormal(segW.diff,invM)
+	};
+
+	// ② AABB×Segment 判定（ローカル空間）— 元コードをほぼコピペ
+	float tNear = 0.f, tFar = 1.f;
+	int   hitAxis = -1;               // まだ決まっていないことを示す
+	int   hitSign = 0;
+	const Vector3 min = -obb.size, max = obb.size;
+
+	auto Slab = [&](float segO, float segD, float slabMin, float slabMax, int axis)
+		{
+			if (std::abs(segD) < 1e-6f) {        // 平行
+				return (segO < slabMin || segO > slabMax);
+			}
+			float invD = 1.0f / segD;
+			float t1 = (slabMin - segO) * invD;
+			float t2 = (slabMax - segO) * invD;
+			if (t1 > t2) std::swap(t1, t2);
+
+			// Near で入った面の法線符号：  +diff ⇒ -面， -diff ⇒ +面
+			int signNear = (segD > 0.0f) ? -1 : 1;
+			if (t1 > tNear) { tNear = t1; hitAxis = axis; hitSign = signNear; }
+			if (t2 < tFar) { tFar = t2; }
+			return (tNear > tFar || tFar < 0.f || tNear > 1.f);
+		};
+	if (Slab(segL.origin.x, segL.diff.x, min.x, max.x, 0) ||
+		Slab(segL.origin.y, segL.diff.y, min.y, max.y, 1) ||
+		Slab(segL.origin.z, segL.diff.z, min.z, max.z, 2))
+	{
+		return false;
+	}
+
+	// ③ ここまで来れば衝突。追加情報が欲しい場合だけ計算
+	if (hit) {
+		// 衝突点（ローカル → ワールド）
+		Vector3 pL = segL.origin + segL.diff * tNear;
+		hit->point = Vector3::Transform(pL, obb.rotateMatrix) + obb.center;
+
+		// 法線（ローカル ±X/Y/Z → ワールド）
+		if (hitAxis < 0) { return false; }
+
+		Vector3 nL{};
+		nL[hitAxis] = static_cast<float>(hitSign);
+		hit->normal = Vector3::TransformNormal(nL, obb.rotateMatrix).Normalize();
+
+		// t 値
+		hit->t = tNear;
+	}
+	return true;
 }
 
 bool Collision3D::OBBOBB(const Collider* a, const Collider* b)

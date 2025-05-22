@@ -54,6 +54,11 @@ Vector3 Vector3::Lerp(const Vector3& v1, const Vector3& v2, float t)
     );
 }
 
+Vector3 Vector3::Reflect(const Vector3& v, const Vector3& n)
+{
+    return v - n * 2.0f * Dot(v, n);
+}
+
 // 正規化
 Vector3 Vector3::Normalize() const {
     float length = Length();
@@ -149,6 +154,16 @@ Vector3& Vector3::operator*=(float scalar) {
     y *= scalar;
     z *= scalar;
     return *this;
+}
+
+float& Vector3::operator[](int i) {
+    assert(i >= 0 && i < 3);
+    return *(&x + i);
+}
+
+const float& Vector3::operator[](int i) const {
+    assert(i >= 0 && i < 3);
+    return *(&x + i);
 }
 
 // フレンド関数：スカラー倍の演算子オーバーロード
