@@ -31,6 +31,11 @@ void Object3d::SetSceneRenderer()
     DirectXEngine::GetSceneRenderer()->SetDrawList(this);
 }
 
+void Object3d::SetRemove()
+{
+    DirectXEngine::GetSceneRenderer()->SetRemove(this);
+}
+
 void Object3d::Update()
 {
     transform_.TransferMatrix(model_);

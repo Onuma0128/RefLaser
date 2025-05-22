@@ -118,6 +118,13 @@ void PlayerMoveState::LaserAttack()
 			laser->SetIsAttack(true);
 			++count;
 		}
+		count = 0;
+		for (auto& energy : player_->GetEnergys()) {
+			if (laserReflectCount_ == count) { break; }
+			if (!energy->GetActive()) { continue; }
+			energy->SetActive(false);
+			++count;
+		}
 	}
 }
 

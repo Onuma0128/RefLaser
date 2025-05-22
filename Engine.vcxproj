@@ -211,6 +211,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\game\scene\gameScene\wall\Wall.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\player\laser\PlayerLaser.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\player\laser\LaserCollider.cpp" />
+    <ClCompile Include="Engine\game\scene\gameScene\player\energy\PlayerEnergy.cpp" />
+    <ClCompile Include="Engine\game\scene\gameScene\wall\WallFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\game\scene\gameScene\enemy\spawner\EnemySpawnerFactory.h" />
@@ -325,6 +327,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\game\scene\gameScene\wall\Wall.h" />
     <ClInclude Include="Engine\game\scene\gameScene\player\laser\PlayerLaser.h" />
     <ClInclude Include="Engine\game\scene\gameScene\player\laser\LaserCollider.h" />
+    <ClInclude Include="Engine\game\scene\gameScene\player\energy\PlayerEnergy.h" />
+    <ClInclude Include="Engine\game\scene\gameScene\wall\WallFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">

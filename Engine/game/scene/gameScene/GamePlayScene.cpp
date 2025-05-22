@@ -23,6 +23,9 @@ void GamePlayScene::Initialize()
 	gameCamera_ = std::make_unique<GameCamera>();
 	gameCamera_->SetPlayer(player_.get());
 	gameCamera_->Init();
+
+	wallFactory_ = std::make_unique<WallFactory>();
+	wallFactory_->Init();
 }
 
 void GamePlayScene::Finalize()
@@ -38,6 +41,8 @@ void GamePlayScene::Update()
 	gameCamera_->Update();
 
 	skyBox_->Update();
+
+	wallFactory_->Update();
 
 	ParticleManager::GetInstance()->Update();
 }

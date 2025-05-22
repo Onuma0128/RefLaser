@@ -9,7 +9,17 @@ class CollisionManager
 public:
     void CheckAllCollisions();
     void AddCollider(Collider* c) { colliders_.push_back(c); }
-    void RemoveCollider(Collider* c) { colliders_.remove(c); }
+    void RemoveCollider(Collider* c) { 
+        colliders_.remove(c);
+        for (auto it = previousFrame_.begin(); it != previousFrame_.end(); )
+        {
+            if (it->first == c || it->second == c) {
+                it = previousFrame_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
 
 private:
     // ペアをソート

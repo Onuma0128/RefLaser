@@ -23,6 +23,8 @@ public:
 
 	void Draws();
 
+	void SetRemove();
+
 	/*==================== メンバ関数 ====================*/
 private:
 	

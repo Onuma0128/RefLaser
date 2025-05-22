@@ -21,6 +21,7 @@ public:
 
 	virtual ~Collider();
 	virtual void AddCollider();
+	virtual void RemoveCollider();
 	virtual void DrawCollider();
 	virtual void Update();
 

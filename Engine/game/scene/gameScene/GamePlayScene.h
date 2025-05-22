@@ -9,6 +9,7 @@
 
 #include "gameScene/player/Player.h"
 #include "gameScene/gameCamera/GameCamera.h"
+#include "gameScene/wall/WallFactory.h"
 
 
 class GamePlayScene : public BaseScene
@@ -33,5 +34,8 @@ private:
 
 	// ゲームカメラの生成
 	std::unique_ptr<GameCamera> gameCamera_ = nullptr;
+
+	// 壁の生成エディタ
+	std::unique_ptr<WallFactory> wallFactory_ = nullptr;
 };
 

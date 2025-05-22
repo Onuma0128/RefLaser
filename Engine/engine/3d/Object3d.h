@@ -24,6 +24,7 @@ public:
 	// 初期化
 	void Initialize(const std::string& filePath);
 	void SetSceneRenderer();
+	void SetRemove();
 
 	// 更新
 	void Update();

@@ -44,6 +44,11 @@ void Line3d::Draws()
 	commandList->DrawInstanced(2, lineCount_, 0, 0);
 }
 
+void Line3d::SetRemove()
+{
+	DirectXEngine::GetSceneRenderer()->SetRemove(this);
+}
+
 void Line3d::CreateLocalVB()
 {
 	LocalVertex local[2] = { {0.f}, {1.f} };   // t=0 / t=1

@@ -31,6 +31,15 @@ void Player::Init()
 		laser->SetPlayer(this);
 		laser->Init();
 	}
+
+	for (size_t i = 0; i < energys_.size(); ++i) {
+		energys_[i] = std::make_unique<PlayerEnergy>();
+		Quaternion q = Quaternion::MakeRotateAxisAngleQuaternion(
+			Vector3::ExprUnitY, static_cast<float>(i) / static_cast<float>(energys_.size()) * 6.28f);
+		Vector3 offset = (Vector3::ExprUnitZ * 3.0f).Transform(Quaternion::MakeRotateMatrix(q));
+
+		energys_[i]->Init(transform_, offset);
+	}
 }
 
 void Player::GlobalInit()
@@ -43,6 +52,10 @@ void Player::Update()
 	state_->Update();
 
 	effect_->Update();
+
+	for (auto& energy : energys_) {
+		energy->Update();
+	}
 
 	Collider::rotate_ = transform_.rotation_;
 	Collider::centerPosition_ = transform_.translation_;

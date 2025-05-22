@@ -14,6 +14,12 @@ void Collider::AddCollider()
 	DirectXEngine::GetCollisionMgr()->AddCollider(this);
 }
 
+void Collider::RemoveCollider()
+{
+	DirectXEngine::GetCollisionMgr()->RemoveCollider(this);
+	DirectXEngine::GetSceneRenderer()->SetRemove(line_.get());
+}
+
 void Collider::DrawCollider()
 {
 #ifdef _DEBUG
