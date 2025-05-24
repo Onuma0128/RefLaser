@@ -280,6 +280,115 @@ bool Collision3D::OBBOBB(const Collider* a, const Collider* b)
 	return true;
 }
 
+bool Collision3D::OBBOBB_MTV(const Collider* colA, const Collider* colB,
+	Vector3* n, float* depth)
+{
+	constexpr float kEpsilon = 1e-6f;
+
+	// ---------- 1) 変数展開 -------------------------------------------------
+	OBB A = ChangeOBB(colA);
+	OBB B = ChangeOBB(colB);
+
+	// A のローカル基底ベクトル
+	auto Aaxis = [&](int i) -> Vector3 {
+		return { A.rotateMatrix.m[0][i], A.rotateMatrix.m[1][i], A.rotateMatrix.m[2][i] };
+		};
+	// B のローカル基底ベクトル
+	auto Baxis = [&](int i) -> Vector3 {
+		return { B.rotateMatrix.m[0][i], B.rotateMatrix.m[1][i], B.rotateMatrix.m[2][i] };
+		};
+
+	// 世界→A 空間への変換は R^T;  ここではドット積で都度計算
+	Vector3 tWorld = B.center - A.center;
+	Vector3 t = { Vector3::Dot(tWorld, Aaxis(0)),
+				  Vector3::Dot(tWorld, Aaxis(1)),
+				  Vector3::Dot(tWorld, Aaxis(2)) };
+
+	// R_AB[i][j] = Ai・Bj
+	float R[3][3], AbsR[3][3];
+	for (int i = 0; i < 3; ++i)
+		for (int j = 0; j < 3; ++j) {
+			R[i][j] = Vector3::Dot(Aaxis(i), Baxis(j));
+			AbsR[i][j] = std::fabs(R[i][j]) + kEpsilon;   // 浮動小数点誤差ガード
+		}
+
+	const Vector3 aExt = A.size;
+	const Vector3 bExt = B.size;
+
+	// ---------- 2) SAT テスト 15 軸 -----------------------------------------
+	float minOverlap = FLT_MAX;
+	Vector3 axisMin = Vector3::ExprUnitX;   // A 空間軸で保持
+	bool    axisIsA = true;                 // True: A の軸, False: それ以外
+
+	auto TestAxis = [&](const Vector3& L, float dist, float rA, float rB, bool fromA)->bool
+		{
+			float overlap = rA + rB - dist;
+			if (overlap < 0.f) return false;         // 分離軸発見 → 非衝突
+
+			if (overlap < minOverlap) {
+				minOverlap = overlap;
+				axisMin = L;
+				axisIsA = fromA;
+			}
+			return true;
+		};
+
+	// --- (A の 3 軸)
+	for (int i = 0; i < 3; ++i) {
+		float dist = std::fabs(t[i]);
+		float rA = aExt[i];
+		float rB = bExt.x * AbsR[i][0] + bExt.y * AbsR[i][1] + bExt.z * AbsR[i][2];
+		if (!TestAxis(Vector3::ExprUnitX * (i == 0) + Vector3::ExprUnitY * (i == 1) + Vector3::ExprUnitZ * (i == 2),
+			dist, rA, rB, true)) return false;
+	}
+
+	// --- (B の 3 軸)
+	for (int j = 0; j < 3; ++j) {
+		Vector3 L = { R[0][j], R[1][j], R[2][j] };          // A 空間での Bj
+		float dist = std::fabs(t.x * R[0][j] + t.y * R[1][j] + t.z * R[2][j]);
+		float rA = aExt.x * AbsR[0][j] + aExt.y * AbsR[1][j] + aExt.z * AbsR[2][j];
+		float rB = bExt[j];
+		if (!TestAxis(L, dist, rA, rB, false)) return false;
+	}
+
+	// --- (交叉軸 9 本  Ai×Bj)
+	for (int i = 0; i < 3; ++i)
+		for (int j = 0; j < 3; ++j)
+		{
+			// 外積の大きさが 0 ⇒ 平行軸 ⇒ スキップ
+			Vector3 L = Vector3::Cross(Aaxis(i), Baxis(j));
+			if (L.Length() < kEpsilon) continue;
+
+			// 投影距離＝ |t・(Ai×Bj)|
+			float dist = std::fabs(
+				t[(i + 1) % 3] * R[(i + 2) % 3][j] - t[(i + 2) % 3] * R[(i + 1) % 3][j]);
+
+			// 投影半径（Real-Time Collision Detection 式）
+			float rA = aExt[(i + 1) % 3] * AbsR[(i + 2) % 3][j] +
+				aExt[(i + 2) % 3] * AbsR[(i + 1) % 3][j];
+
+			float rB = bExt[(j + 1) % 3] * AbsR[i][(j + 2) % 3] +
+				bExt[(j + 2) % 3] * AbsR[i][(j + 1) % 3];
+
+			if (!TestAxis(L.Normalize(), dist, rA, rB, false)) return false;
+		}
+
+	// ---------- 3) MTV をワールド座標で返す ------------------------------
+	if (n && depth) {
+		// axisMin は A 空間。符号を A→B 方向に合わせてから世界へ戻す
+		float sign = (Vector3::Dot(axisMin, t) < 0.f) ? -1.f : 1.f;
+		Vector3 nA = axisMin * sign;
+		Vector3 nW = {
+			nA.x * A.rotateMatrix.m[0][0] + nA.y * A.rotateMatrix.m[0][1] + nA.z * A.rotateMatrix.m[0][2],
+			nA.x * A.rotateMatrix.m[1][0] + nA.y * A.rotateMatrix.m[1][1] + nA.z * A.rotateMatrix.m[1][2],
+			nA.x * A.rotateMatrix.m[2][0] + nA.y * A.rotateMatrix.m[2][1] + nA.z * A.rotateMatrix.m[2][2] };
+
+		*n = nW.Normalize();   // 押し出し法線（長さ 1）
+		*depth = minOverlap;       // めり込み深さ (>0)
+	}
+	return true;                   // 交差している
+}
+
 Sphere Collision3D::ChangeSphere(const Collider* collider)
 {
 	return {

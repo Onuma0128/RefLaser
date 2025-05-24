@@ -57,6 +57,9 @@ void Framework::LoadFiles()
 	ModelManager::GetInstance()->LoadModel("resources", "suzanne.obj");
 	ModelManager::GetInstance()->LoadModel("resources", "Box.obj");
 	ModelManager::GetInstance()->LoadModel("resources/human", "walk.gltf");
+
+	ModelManager::GetInstance()->LoadModel("resources/player/top", "player_top.obj");
+	ModelManager::GetInstance()->LoadModel("resources/player/bottom", "player_bottom.obj");
 }
 
 void Framework::Run()

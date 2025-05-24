@@ -78,7 +78,7 @@ public:
 
 	void SetTransform(EulerTransform transform) { transform_ = transform; }
 	void SetUVTransform(Transform2D transform) { uvTransform_ = transform; }
-	void SetTexture(const std::string& directoryPath, const std::string& filePath);
+	void SetTexture(const std::string& filePath);
 	void SetColor(const Vector3& color) {
 		materialData_->color.x = color.x;
 		materialData_->color.y = color.y;
