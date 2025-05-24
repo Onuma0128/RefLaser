@@ -5,11 +5,20 @@
 #include "gameScene/enemy/state/EnemyMoveState.h"
 #include "gameScene/player/Player.h"
 #include "gameScene/gameCamera/GameCamera.h"
+#include "gameScene/enemy/manager/EnemyManager.h"
+
+void Enemy::Finalize()
+{
+	Animation::SetRemove();
+	Collider::RemoveCollider();
+}
 
 void Enemy::Init()
 {
-	Object3d::Initialize("Box.obj");
-	Object3d::SetSceneRenderer();
+	GlobalInit();
+
+	Animation::Init("resources/enemy","enemy.gltf");
+	Animation::SetSceneRenderer();
 
 	transform_.scale_ = { 0.5f,0.5f,0.5f };
 	transform_.translation_ = { 0.0f,0.5f,0.0f };
@@ -29,6 +38,23 @@ void Enemy::Init()
 
 void Enemy::Update()
 {
+#ifdef _DEBUG
+	type_ = static_cast<EnemyType>(global_->GetValue<int32_t>("EnemyManager", groupName_ + "/Type"));
+	isDelete_ = global_->GetValue<bool>("EnemyManager", groupName_ + "/Delete");
+
+	// EnemyManagerのPrefabデータを更新
+	DebugPrefabData();
+	// フラグで移動管理
+	if (!global_->GetValue<bool>("EnemyManager", "isMove")) {
+		DebugTransform();
+		Collider::centerPosition_ = transform_.translation_;
+		Collider::rotate_ = transform_.rotation_;
+		Collider::Update();
+		Animation::Update();
+		return;
+	}
+#endif // _DEBUG
+
 	state_->Update();
 
 	effect_->Update();
@@ -37,7 +63,7 @@ void Enemy::Update()
 	Collider::rotate_ = transform_.rotation_;
 	Collider::Update();
 
-	Object3d::Update();
+	Animation::Update();
 }
 
 void Enemy::Draw()
@@ -56,14 +82,6 @@ void Enemy::ChengeState(std::unique_ptr<EnemyBaseState> newState)
 
 void Enemy::OnCollisionEnter(Collider* other)
 {
-	// プレイヤーの弾と当たっているなら
-	if (other->GetColliderName() == "PlayerBullet") {
-		gameCamera_->SetShake(1.0f);
-		DeltaTimer::SetTimeScaleForSeconds(0.1f, 0.3f);
-	}
-
-	if (other->GetColliderName() == "PlayerReticle") {
-	}
 }
 
 void Enemy::OnCollisionStay(Collider* other)
@@ -73,7 +91,7 @@ void Enemy::OnCollisionStay(Collider* other)
 		//Object3d::SetColor(Vector4{ 1.0f,0.0f,0.0f,1.0f });
 		const float speed = 2.0f;
 		transform_.translation_ -= velocity_ * speed * DeltaTimer::GetDeltaTime();
-		Object3d::Update();
+		Animation::Update();
 	}
 
 	// 敵と当たっているなら
@@ -84,13 +102,7 @@ void Enemy::OnCollisionStay(Collider* other)
 		velocity.y = 0.0f;
 		if (velocity.Length() != 0.0f) { velocity = velocity.Normalize(); }
 		transform_.translation_ += velocity * speed * DeltaTimer::GetDeltaTime();
-		Object3d::Update();
-	}
-
-	// プレイヤーのレティクルと当たっているなら
-	if (other->GetColliderName() == "PlayerReticle") {
-		Object3d::GetRenderOptions().offscreen = false;
-		Collider::isActive_ = false;
+		Animation::Update();
 	}
 }
 
@@ -100,11 +112,44 @@ void Enemy::OnCollisionExit(Collider* other)
 	// 敵と当たっているなら
 	if (other->GetColliderName() == "Player" ||
 		other->GetColliderName() == "Enemy") {
-		Object3d::SetColor(Vector4{ 1.0f,1.0f,1.0f,1.0f });
-		Object3d::Update();
+		Animation::SetColor(Vector4{ 1.0f,1.0f,1.0f,1.0f });
+		Animation::Update();
 	}
+}
+void Enemy::GlobalInit()
+{
+	// タイプ
+	std::vector<const char*> typeNames = { "Melee", "Ranged","Shield" };
+	global_->AddValue<int32_t>("EnemyManager", groupName_ + "/Type", 0, typeNames);
+	// 座標
+	global_->AddValue<Vector3>("EnemyManager", groupName_ + "/position", { 0.0f,0.0f,0.0f });
+	// 削除するか
+	global_->AddValue<bool>("EnemyManager", groupName_ + "/Delete", false);
+}
 
-	if (other->GetColliderName() == "PlayerReticle") {
-		//Object3d::GetRenderOptions().offscreen = true;
-	}
+void Enemy::DebugTransform()
+{
+	transform_.scale_ = { 0.5f,0.5f,0.5f };
+	transform_.rotation_ = Quaternion::IdentityQuaternion();
+	transform_.translation_ = global_->GetValue<Vector3>("EnemyManager", groupName_ + "/position");
+}
+
+void Enemy::DebugPrefabData()
+{
+	// 全体
+	prefabData_.moveSpeed = enemyManager_->GetPrefabData().moveSpeed;
+	prefabData_.moveLength = enemyManager_->GetPrefabData().moveLength;
+	// 近距離
+	prefabData_.M_attackLength = enemyManager_->GetPrefabData().M_attackLength;
+	prefabData_.M_attackTimer = enemyManager_->GetPrefabData().M_attackTimer;
+	prefabData_.M_chengeStateTimer = enemyManager_->GetPrefabData().M_chengeStateTimer;
+	// 遠距離
+	prefabData_.bulletSpeed = enemyManager_->GetPrefabData().bulletSpeed;
+	prefabData_.R_attackLength = enemyManager_->GetPrefabData().R_attackLength;
+	prefabData_.R_attackTimer = enemyManager_->GetPrefabData().R_attackTimer;
+	prefabData_.R_chengeStateTimer = enemyManager_->GetPrefabData().R_chengeStateTimer;
+	// 盾持ち
+	prefabData_.stopLength = enemyManager_->GetPrefabData().stopLength;
+	prefabData_.shieldScale = enemyManager_->GetPrefabData().shieldScale;
+	prefabData_.shieldPosition = enemyManager_->GetPrefabData().shieldPosition;
 }

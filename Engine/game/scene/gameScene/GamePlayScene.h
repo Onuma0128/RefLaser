@@ -10,6 +10,7 @@
 #include "gameScene/player/Player.h"
 #include "gameScene/gameCamera/GameCamera.h"
 #include "gameScene/wall/WallFactory.h"
+#include "gameScene/enemy/manager/EnemyManager.h"
 
 
 class GamePlayScene : public BaseScene
@@ -37,5 +38,9 @@ private:
 
 	// 壁の生成エディタ
 	std::unique_ptr<WallFactory> wallFactory_ = nullptr;
+
+	// 敵の生成エディタ
+	std::unique_ptr<EnemyManager> enemyManager_ = nullptr;
+
 };
 

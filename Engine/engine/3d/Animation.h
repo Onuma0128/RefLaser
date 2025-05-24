@@ -16,6 +16,7 @@ public:
 
 	void Init(const std::string& directoryPath, const std::string& filename);
 	void SetSceneRenderer();
+	void SetRemove();
 
 	void Update();
 

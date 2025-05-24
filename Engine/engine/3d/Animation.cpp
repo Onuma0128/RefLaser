@@ -48,9 +48,11 @@ void Animation::Init(const std::string& directoryPath, const std::string& filena
 		}
 	}
 
+#ifdef _DEBUG
 	// Line3dを初期化
 	line_ = std::make_unique<Line3d>();
 	line_->Initialize(linePositions);
+#endif // _DEBUG
 }
 
 void Animation::SetSceneRenderer()
@@ -60,6 +62,14 @@ void Animation::SetSceneRenderer()
 		.offscreen = true
 	};
 	DirectXEngine::GetSceneRenderer()->SetDrawList(this);
+}
+
+void Animation::SetRemove()
+{
+	DirectXEngine::GetSceneRenderer()->SetRemove(this);
+	if (line_ != nullptr) {
+		DirectXEngine::GetSceneRenderer()->SetRemove(line_.get());
+	}
 }
 
 void Animation::Update()
@@ -73,6 +83,7 @@ void Animation::Update()
 
 	transform_.TransferMatrix(Matrix4x4::Identity());
 
+#ifdef _DEBUG
 	int32_t count = 0;
 	std::vector<Vector3> linePositions{};
 	for (const Joint& joint : skeleton_.joints) {
@@ -93,6 +104,7 @@ void Animation::Update()
 
 	line_->SetPositions(linePositions);
 	line_->Update();
+#endif // _DEBUG
 }
 
 void Animation::Draw()

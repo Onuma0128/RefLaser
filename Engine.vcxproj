@@ -114,6 +114,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\game\scene\gameScene\enemy\manager\EnemyManager.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\enemy\spawner\EnemySpawnerFactory.cpp" />
     <ClCompile Include="Engine\game\scene\gameScene\enemy\state\EnemyMoveState.cpp" />
     <ClCompile Include="Engine\engine\base\collider\Collider.cpp" />
@@ -216,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\game\scene\gameScene\player\PlayerTop.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\game\scene\gameScene\enemy\manager\EnemyManager.h" />
     <ClInclude Include="Engine\game\scene\gameScene\enemy\spawner\EnemySpawnerFactory.h" />
     <ClInclude Include="Engine\game\scene\gameScene\enemy\state\EnemyMoveState.h" />
     <ClInclude Include="Engine\engine\base\collider\Collider.h" />

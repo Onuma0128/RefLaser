@@ -92,20 +92,22 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
     for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
         aiMesh* mesh = scene->mMeshes[meshIndex];
         assert(mesh->HasNormals());
-        modelData.vertices.resize(mesh->mNumVertices);
+        size_t vertexOffset = modelData.vertices.size();
+        modelData.vertices.resize(vertexOffset + mesh->mNumVertices);
 
         for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
             aiVector3D& position = mesh->mVertices[vertexIndex];
             aiVector3D& normal = mesh->mNormals[vertexIndex];
 
-            modelData.vertices[vertexIndex].position = { -position.x,position.y,position.z,1.0f };
-            modelData.vertices[vertexIndex].normal = { -normal.x,normal.y,normal.z };
-
+            VertexData& vertices = modelData.vertices[vertexOffset + vertexIndex];
+            vertices.position = { -position.x,position.y,position.z,1.0f };
+            vertices.normal = { -normal.x,normal.y,normal.z };
+            
             if (mesh->HasTextureCoords(0)) {
                 aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-                modelData.vertices[vertexIndex].texcoord = { texcoord.x,texcoord.y };
+                modelData.vertices[vertexOffset + vertexIndex].texcoord = { texcoord.x,texcoord.y };
             } else {
-                modelData.vertices[vertexIndex].texcoord = { 0.0f,0.0f };
+                modelData.vertices[vertexOffset + vertexIndex].texcoord = { 0.0f,0.0f };
             }
         }
 
@@ -115,7 +117,7 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 
             for (uint32_t element = 0; element < face.mNumIndices; ++element) {
                 uint32_t vertexIndex = face.mIndices[element];
-                modelData.indices.push_back(vertexIndex);
+                modelData.indices.push_back(vertexIndex + +static_cast<uint32_t>(vertexOffset));
             }
         }
 
@@ -136,7 +138,10 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
             jointWeightData.inverseBindPosMatrix = Matrix4x4::Inverse(bindPoseMatrix);
 
             for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
-                jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight,bone->mWeights[weightIndex].mVertexId });
+                jointWeightData.vertexWeights.push_back({
+                    bone->mWeights[weightIndex].mWeight,
+                    bone->mWeights[weightIndex].mVertexId + static_cast<uint32_t>(vertexOffset)
+                });
             }
         }
     }
