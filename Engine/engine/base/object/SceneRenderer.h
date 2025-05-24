@@ -69,3 +69,7 @@ template<>
 inline void SceneRenderer::SetDrawList<Animation>(Animation* animation) {
 	animations_.push_back(animation);
 }
+template<>
+inline void SceneRenderer::SetRemove<Animation>(Animation* animation) {
+	animations_.remove(animation);
+}
