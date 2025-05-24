@@ -5,6 +5,7 @@
 
 #include "Vector3.h"
 #include "Quaternion.h"
+#include "Transform.h"
 
 class LaserCollider : public Collider
 {
@@ -12,7 +13,7 @@ public:
 
 	void Init();
 
-	void Update(std::vector<Vector3> positions);
+	void Update(const EulerTransform& transform);
 
 	void SetActive(bool flag) { Collider::isActive_ = flag; }
 

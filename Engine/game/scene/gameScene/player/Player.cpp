@@ -1,13 +1,14 @@
 #include "Player.h"
 
 #include "Input.h"
+#include "Collision3D.h"
 
 #include "state/PlayerMoveState.h"
 
 void Player::Init()
 {
-	Object3d::Initialize("Box.obj");
-	Object3d::GetRenderOptions().enabled = false;
+	Object3d::Initialize("player_bottom.obj");
+	Object3d::SetSceneRenderer();
 
 	transform_.scale_ = { 0.5f,0.5f,0.5f };
 	transform_.translation_ = { 0.0f,0.5f,0.0f };
@@ -24,7 +25,8 @@ void Player::Init()
 	Collider::size_ = transform_.scale_;
 	Collider::DrawCollider();
 
-	rightStickQuaternion_ = Quaternion::IdentityQuaternion();
+	playerTop_ = std::make_unique<PlayerTop>();
+	playerTop_->Init();
 
 	for (auto& laser : lasers_) {
 		laser = std::make_unique<PlayerLaser>();
@@ -53,6 +55,9 @@ void Player::Update()
 
 	effect_->Update();
 
+	playerTop_->GetTransform().translation_ = transform_.translation_;
+	playerTop_->Update(topQuaternion_);
+
 	for (auto& energy : energys_) {
 		energy->Update();
 	}
@@ -78,8 +83,46 @@ void Player::OnCollisionEnter(Collider* other)
 
 void Player::OnCollisionStay(Collider* other)
 {
+	if (other->GetColliderName() == "Wall") {
+		Vector3 n; float d;
+		if (Collision3D::OBBOBB_MTV(this, other, &n, &d))
+		{
+			Vector3 mtv = n * (d + 0.001f);
+
+			// -------------------- 追加ここから --------------------
+			Vector3 mtvXZ = { mtv.x, 0.0f, mtv.z };
+
+			// 縦押しなら：中心差ベクトルの水平成分で代用
+			if (mtvXZ.Length() < 1e-6f) {
+				Vector3 centerDiff = other->GetCenterPosition() - GetCenterPosition();
+				mtvXZ = centerDiff;
+				mtvXZ.y = 0.0f;
+				if (mtvXZ.Length() != 0.0f) {
+					mtvXZ = mtvXZ.Normalize() * (d + 0.00001f);
+				} else {
+					mtvXZ = Vector3::ExprUnitZ * (d + 0.00001f);
+				}
+			}
+			// -------------------- 追加ここまで --------------------
+
+			transform_.translation_ -= mtvXZ;
+
+			// スライド処理
+			Vector3 slideN = mtvXZ.Normalize();
+			float vn = Vector3::Dot(velocity_, slideN);
+			if (vn < 0) velocity_ -= slideN * vn;
+
+			// Collider を即更新して次ペアへの二次衝突を防ぐ
+			centerPosition_ = transform_.translation_;
+			Collider::Update();
+			isHit_ = true;
+		}
+	}
 }
 
 void Player::OnCollisionExit(Collider* other)
 {
+	if (other->GetColliderName() == "Wall") {
+		isHit_ = false;
+	}
 }

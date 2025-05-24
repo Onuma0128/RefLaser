@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Line3d.h"
+#include "PrimitiveDrawr.h"
 #include "Collider.h"
 #include "Vector3.h"
 
@@ -31,6 +32,7 @@ public:
 	void SetIsHit(){ isHit_ = false; }
 
 	void SetIsAttack(bool flag) { isAttack_ = flag; }
+	void CreateLaser();
 
 private:
 
@@ -40,6 +42,8 @@ private:
 
 	Player* player_ = nullptr;
 
+	// レーザーの描画
+	std::unique_ptr<PrimitiveDrawr> laserPlane_ = nullptr;
 	// レーザーのライン描画
 	std::unique_ptr<Line3d> laserLine_ = nullptr;
 	// レーザーのコライダー

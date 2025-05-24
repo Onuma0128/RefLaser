@@ -12,8 +12,8 @@ void WallFactory::Init()
 	for (int32_t i = 0; i < spownCount; ++i) {
 		// 敵の初期化
 		std::unique_ptr<Wall> wall = std::make_unique<Wall>();
-		std::string charaName = "WallObject" + std::to_string(i);
-		wall->SetGroupNumber(i);
+		std::string charaName = "WallObject" + std::to_string(i + 1);
+		wall->SetGroupNumber(i + 1);
 		wall->Init();
 		wallObjects_.push_back(std::move(wall));
 	}

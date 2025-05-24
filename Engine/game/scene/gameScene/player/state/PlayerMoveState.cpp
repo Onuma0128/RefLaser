@@ -46,12 +46,14 @@ void PlayerMoveState::PlayerMove()
 	velocity.x = input->GetGamepadLeftStickX();
 	velocity.z = input->GetGamepadLeftStickY();
 
+	if(!player_->IsWallHit())
 	player_->GetTransform().translation_ += velocity * DeltaTimer::GetDeltaTime() * playerSpeed;
 
 	// 移動時の回転の処理
 	if (velocity.Length() != 0.0f) {
 		// 回転を適応
 		player_->GetTransform().rotation_ = VelocityToQuaternion(velocity, 0.1f);
+		player_->SetVelocity(velocity);
 	}
 }
 
@@ -65,7 +67,9 @@ void PlayerMoveState::LaserMove()
 	// 押されているならvelocityを更新
 	if (velocity.Length() != 0.0f) {
 		velocity = velocity.Normalize();
-		rightStickVelocity_ = Vector3::Lerp(rightStickVelocity_, velocity, 0.5f);
+		rightStickVelocity_ = Vector3::Lerp(rightStickVelocity_, velocity, 0.1f);
+		Quaternion target = VelocityToQuaternion(rightStickVelocity_, 1.0f);
+		player_->SetTopQuaternion(Quaternion::Slerp(player_->GetTopQuaternion(), target, 0.5f));
 	}
 
 	Vector3 hitPos{};
@@ -115,6 +119,7 @@ void PlayerMoveState::LaserAttack()
 		uint32_t count = 0;
 		for (auto& laser : player_->GetLasers()) {
 			if (laserReflectCount_ == count) { break; }
+			laser->CreateLaser();
 			laser->SetIsAttack(true);
 			++count;
 		}

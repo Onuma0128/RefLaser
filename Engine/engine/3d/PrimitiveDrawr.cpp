@@ -15,7 +15,7 @@ void PrimitiveDrawr::Init(std::vector<Vector3> pos)
 	primitiveDrawrBase_->Initialize();
 	positions_ = pos;
 
-	SetTexture("resources", "white1x1.png");
+	SetTexture("white1x1.png");
 
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * 4);
 	CreateVertexBufferView(4);
@@ -143,12 +143,9 @@ void PrimitiveDrawr::SetPosition(std::vector<Vector3> pos)
 	vertexData_[3].position = { pos[3].x,pos[3].y,pos[3].z,1.0f };
 }
 
-void PrimitiveDrawr::SetTexture(const std::string& directoryPath, const std::string& filePath)
+void PrimitiveDrawr::SetTexture(const std::string& filePath)
 {
-	textureData_.directoryPath = directoryPath;
 	textureData_.filePath = filePath;
-
-	TextureManager::GetInstance()->LoadTexture(textureData_.directoryPath, textureData_.filePath);
 	textureData_.textureIndex = TextureManager::GetInstance()->GetSrvIndex(textureData_.filePath);
 }
 
@@ -241,7 +238,7 @@ void PrimitiveDrawr::CreateWVPData()
 
 void PrimitiveDrawr::InitPlane()
 {
-	SetTexture("resources", "uvChecker.png");
+	SetTexture("uvChecker.png");
 
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * 6);
 	CreateVertexBufferView(6);
@@ -295,7 +292,7 @@ void PrimitiveDrawr::InitSphere(uint32_t kSubdivision)
 {
 	kSubdivision_ = kSubdivision;
 	
-	SetTexture("resources", "white1x1.png");
+	SetTexture("white1x1.png");
 
 	uint32_t startIndex = kSubdivision * kSubdivision * 6;
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * startIndex);
@@ -359,7 +356,7 @@ void PrimitiveDrawr::InitRing(uint32_t kRingDivide)
 {
 	kRingDivide_ = kRingDivide;
 
-	SetTexture("resources", "gradationLine.png");
+	SetTexture("gradationLine.png");
 
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * kRingDivide_ * 6);
 	CreateVertexBufferView(kRingDivide_ * 6);
@@ -430,7 +427,7 @@ void PrimitiveDrawr::InitCylinder(uint32_t kCylinderDivide)
 {
 	kCylinderDivide_ = kCylinderDivide;
 
-	SetTexture("resources", "gradationLine.png");
+	SetTexture("gradationLine.png");
 
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * kCylinderDivide_ * 6);
 	CreateVertexBufferView(kCylinderDivide_ * 6);
@@ -500,7 +497,7 @@ void PrimitiveDrawr::CreateCylinderVertexData(VertexData* vertexData, uint32_t k
 
 void PrimitiveDrawr::InitSkybox()
 {
-	SetTexture("resources", "output.dds");
+	SetTexture("output.dds");
 
 	CreateBufferResource(vertexResource_, sizeof(VertexData) * 36);
 	CreateVertexBufferView(36);

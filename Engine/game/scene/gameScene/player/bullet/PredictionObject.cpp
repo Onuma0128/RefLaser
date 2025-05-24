@@ -13,9 +13,9 @@ void PredictionObject::Init(const Vector3& offset)
 
 void PredictionObject::Update()
 {
-	Matrix4x4 rotateMat = Quaternion::MakeRotateMatrix(player_->GetRightStickQua());
+	/*Matrix4x4 rotateMat = Quaternion::MakeRotateMatrix(player_->GetRightStickQua());
 	Vector3 position = offset_.Transform(rotateMat);
 	transform_.translation_ = player_->GetTransform().translation_ + position;
 
-	Object3d::Update();
+	Object3d::Update();*/
 }

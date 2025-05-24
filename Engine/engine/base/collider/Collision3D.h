@@ -55,6 +55,8 @@ public:
 	// OBBとOBBの衝突判定
 	static bool OBBOBB(const Collider* a, const Collider* b);
 
+	static bool OBBOBB_MTV(const Collider* colA, const Collider* colB, Vector3* n, float* depth);
+
 private:
 
 	static Sphere ChangeSphere(const Collider* collider);

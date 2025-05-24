@@ -83,7 +83,7 @@ void Line3d::CreateInstanceVB(const std::vector<Vector3>& pos)
 	instanceVB_->Unmap(0, nullptr);
 
 	vbvInst_.BufferLocation = instanceVB_->GetGPUVirtualAddress();
-	vbvInst_.SizeInBytes = bytes;
+	vbvInst_.SizeInBytes = static_cast<UINT>(bytes);
 	vbvInst_.StrideInBytes = sizeof(LineInstance);
 }
 

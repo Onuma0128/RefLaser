@@ -14,21 +14,24 @@ void LaserCollider::Init()
 	activeFrame_ = 1.0f;
 }
 
-void LaserCollider::Update(std::vector<Vector3> positions)
+void LaserCollider::Update(const EulerTransform& transform)
 {
 	ActiveCollider();
 
-	// レーザーに合わせたコライダーのTransformを初期化
-	float size = (positions[0] - positions[1]).Length() / 2.0f;
-	Vector3 velocity = (positions[0] - positions[1]);
-	if (velocity.Length() != 0.0f) { velocity = velocity.Normalize(); }
-	else { velocity = Vector3::ExprUnitZ; }
-	Vector3 position = (positions[0] + positions[1]) * 0.5f;
+	//// レーザーに合わせたコライダーのTransformを初期化
+	//float size = (positions[0] - positions[1]).Length() / 2.0f;
+	//Vector3 velocity = (positions[0] - positions[1]);
+	//if (velocity.Length() != 0.0f) { velocity = velocity.Normalize(); }
+	//else { velocity = Vector3::ExprUnitZ; }
+	//Vector3 position = (positions[0] + positions[1]) * 0.5f;
 
 	// レーザーに合わせたコライダーを設定する
-	Collider::size_ = { activeFrame_,activeFrame_,size };
-	Collider::rotate_ = VelocityToQuaternion(velocity, 1.0f);
-	Collider::centerPosition_ = position;
+	Collider::size_ = transform.scale;
+	Quaternion result =
+		Quaternion::MakeRotateAxisAngleQuaternion(Vector3::ExprUnitY, transform.rotation.y) *
+		Quaternion::MakeRotateAxisAngleQuaternion(Vector3::ExprUnitX, transform.rotation.x);
+	Collider::rotate_ = result;
+	Collider::centerPosition_ = transform.translation;
 
 	Collider::Update();
 }
